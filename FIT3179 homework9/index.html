@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Malaysia HIES by State (2022)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Vega + Vega-Lite (v5 to match the schema) + Embed -->
+  <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+  <style>
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+    header{padding:16px 20px;border-bottom:1px solid #eee}
+    #vis{max-width:1100px;margin:22px auto;padding:0 16px}
+    small{color:#666}
+  </style>
+</head>
+<body>
+  <header>
+    <h1 style="margin:0 0 6px">Household Income & Poverty in Malaysia (2022)</h1>
+    <small>Data: <code>hies_state_with_coords.csv</code> • Basemap: <code>ne_110m_Malaysia.json</code></small>
+  </header>
+
+  <div id="vis"></div>
+
+  <script>
+    const spec = {
+      "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+      "title": "Malaysia Household Income & Poverty by State (Symbols, 2022)",
+      "width": 860,
+      "height": 520,
+      "projection": {"type": "mercator"},
+      "layer": [
+        {
+          "data": {
+            "url": "https://raw.githubusercontent.com/jesscf08/FIT3179-/refs/heads/main/ne_110m_Malaysia.json",
+            "format": { "type": "topojson", "feature": "ne_110m_admin_0_countries" }
+          },
+          "transform": [
+            { "filter": "datum.properties.NAME == 'Malaysia'" }
+          ],
+          "mark": { "type": "geoshape", "fill": "#f3f4f6", "stroke": "#cbd5e1" }
+        },
+        {
+          "data": {
+            "url": "https://raw.githubusercontent.com/jesscf08/FIT3179-/refs/heads/main/hies_state_with_coords.csv"
+          },
+          "mark": { "type": "circle", "opacity": 0.9, "stroke": "white", "strokeWidth": 0.6 },
+          "encoding": {
+            "longitude": { "field": "longitude", "type": "quantitative" },
+            "latitude": { "field": "latitude", "type": "quantitative" },
+            "size": {
+              "field": "income_median",
+              "type": "quantitative",
+              "title": "Median Household Income (RM)",
+              "scale": { "range": [40, 900] }
+            },
+            "color": {
+              "field": "poverty",
+              "type": "quantitative",
+              "title": "Poverty Rate (%)",
+              "scale": { "scheme": "reds" }
+            },
+            "tooltip": [
+              { "field": "state", "title": "State" },
+              { "field": "income_median", "type": "quantitative", "format": ",", "title": "Income (RM)" },
+              { "field": "poverty", "type": "quantitative", "format": ".1f", "title": "Poverty (%)" },
+              { "field": "latitude", "type": "quantitative" },
+              { "field": "longitude", "type": "quantitative" }
+            ]
+          }
+        }
+      ],
+      "config": { "view": { "stroke": null } }
+    };
+
+    vegaEmbed('#vis', spec, {actions:false});
+  </script>
+</body>
+</html>
